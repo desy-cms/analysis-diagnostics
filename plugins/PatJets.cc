@@ -64,6 +64,7 @@ class PatJets : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
       edm::InputTag patJets_;
       edm::EDGetTokenT<pat::JetCollection> jetsToken_;
       double ptMin_;
+      std::string bTag_;
       
       // histograms
       edm::Service<TFileService> fs_;
@@ -86,7 +87,8 @@ class PatJets : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 PatJets::PatJets(const edm::ParameterSet& config):
 patJets_(config.getParameter<edm::InputTag> ("PatJets")),
 jetsToken_(consumes<pat::JetCollection>(patJets_)),
-ptMin_(config.getParameter<double> ("PTMin"))
+ptMin_(config.getParameter<double> ("PTMin")),
+bTag_(config.getParameter<std::string> ("BTag"))
 {
    //now do what ever initialization is needed
    usesResource("TFileService");
@@ -123,6 +125,8 @@ PatJets::analyze(const edm::Event& event, const edm::EventSetup& setup)
    for ( auto & jet : jets )
    {
       if ( ptMin_ > 0 && jet.pt() < ptMin_ ) continue;
+      
+      float btag = jet.bDiscriminator(bTag_);
       
       double nHadFrac = jet.neutralHadronEnergyFraction();
       double nEmFrac  = jet.neutralEmEnergyFraction();
@@ -164,6 +168,7 @@ PatJets::analyze(const edm::Event& event, const edm::EventSetup& setup)
       h_jets_["cMult"]    -> Fill(cMult   );
       h_jets_["muFrac"]   -> Fill(muFrac  );
       h_jets_["nConst"]   -> Fill(nConst  );
+      h_jets_["bTag"]     -> Fill(btag    );
       
       ++njets;
       
@@ -181,6 +186,7 @@ PatJets::analyze(const edm::Event& event, const edm::EventSetup& setup)
          h_jets_id_["cMult"]    -> Fill(cMult   );
          h_jets_id_["muFrac"]   -> Fill(muFrac  );
          h_jets_id_["nConst"]   -> Fill(nConst  );
+         h_jets_id_["bTag"]     -> Fill(btag    );
          
          ++njets_id;
          
@@ -237,7 +243,9 @@ void PatJets::createHistograms()
    h_jets_["muFrac"]   = fs_->make<TH1F>("muFrac"   , "" , 100, 0, 1);
    h_jets_["nConst"]   = fs_->make<TH1F>("nConst"   , "" , 40, 0, 40);
    
-   //
+   h_jets_["bTag"]     = fs_->make<TH1F>("bTag"   , "" , 50, 0, 1);
+   
+   // id Loose
    h_jets_id_["n"]       = fs_->make<TH1F>("n_idloose" , "" , 30, 0, 30);
    h_jets_id_["pt"]       = fs_->make<TH1F>("pt_idloose" , "" , 500, 0, 100);
    h_jets_id_["eta"]      = fs_->make<TH1F>("eta_idloose" , "" , 100, -5, 5);
@@ -251,6 +259,8 @@ void PatJets::createHistograms()
    h_jets_id_["cMult"]    = fs_->make<TH1F>("cMult_idloose"    , "" , 40, 0, 40);
    h_jets_id_["muFrac"]   = fs_->make<TH1F>("muFrac_idloose"   , "" , 100, 0, 1);
    h_jets_id_["nConst"]   = fs_->make<TH1F>("nConst_idloose"   , "" , 40, 0, 40);
+   
+   h_jets_id_["bTag"]     = fs_->make<TH1F>("bTag_idloose"     , "" , 50, 0, 1);
    
 }
 
