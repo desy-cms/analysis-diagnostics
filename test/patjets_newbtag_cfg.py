@@ -25,11 +25,21 @@ process.TFileService = cms.Service("TFileService",
 # Updating jet collection
 
 from PhysicsTools.PatAlgos.tools.jetTools import updateJetCollection
-## Update the slimmedJets in miniAOD: corrections from the chosen Global Tag are applied
+## b-tag discriminators
+bTagDiscriminators = [
+    'deepFlavourJetTags:probudsg',
+    'deepFlavourJetTags:probb',
+    'deepFlavourJetTags:probc',
+    'deepFlavourJetTags:probbb',
+    'deepFlavourJetTags:probcc',
+]
+
+## Update the slimmedJets in miniAOD: corrections from the chosen Global Tag are applied and the b-tag discriminators are re-evaluated
 updateJetCollection(
     process,
     jetSource = cms.InputTag('slimmedJets','','PAT'),
     jetCorrections = ('AK4PFchs', cms.vstring(['L1FastJet', 'L2Relative', 'L3Absolute']), 'None'),
+    btagDiscriminators = bTagDiscriminators,
 )
 
 
@@ -47,26 +57,13 @@ process.trigger = cms.EDFilter( "TriggerResultsFilter",
 
 
 process.patjets = cms.EDAnalyzer('PatJets',
-   PatJets = cms.InputTag("slimmedJets"),
-   PTMin = cms.double(-1),
-   BTag = cms.string("pfCombinedMVAV2BJetTags"),
-)
-process.updatedpatjets = cms.EDAnalyzer('PatJets',
-   PatJets = cms.InputTag("updatedPatJets"),
-   PTMin = cms.double(-1),
-   BTag = cms.string("pfCombinedMVAV2BJetTags"),
-)
-
-process.selupdatedpatjets = cms.EDAnalyzer('PatJets',
    PatJets = cms.InputTag("selectedUpdatedPatJets"),
    PTMin = cms.double(-1),
-   BTag = cms.string("pfCombinedMVAV2BJetTags"),
+   BTag = cms.string("deepFlavourJetTags:probb"),
 )
 
 process.p = cms.Path(
-                     process.patjets +
-                     process.updatedpatjets +
-                     process.selupdatedpatjets
+                     process.patjets 
                      )
 
 readFiles = cms.untracked.vstring()
