@@ -4,7 +4,7 @@ import FWCore.ParameterSet.VarParsing as VarParsing
 process = cms.Process("Diagnosis")
 
 options = VarParsing.VarParsing ('analysis')
-options.inputFiles =  'file:/afs/desy.de/user/w/walsh/cms/analysis/cmssw/hlt/CMSSW_8_0_24/src/HLTrigger/Configuration/mssmhbb/QCD_Pt-120to170_MuEnrichedPt5_User_tranche4_l1repack.root',
+options.inputFiles =  'file:/nfs/dust/cms/user/walsh/tmp/outputFULL.root',
 #options.inputFiles =  '/store/mc/RunIISummer16DR80/QCD_Pt-120to170_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/GEN-SIM-RAW/FlatPU28to62HcalNZSRAW_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/130000/08C6F278-E0A2-E611-BE0C-002590D9DA9C.root',
 options.parseArguments()
 
@@ -19,7 +19,7 @@ process.source = cms.Source ("PoolSource",
 ##  Using MINIAOD. GlobalTag just in case jet re-clustering, L1 trigger filter  etc is needed to be done
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag as customiseGlobalTag
-process.GlobalTag = customiseGlobalTag(process.GlobalTag, globaltag = '80X_mcRun2_asymptotic_2016_TrancheIV_v6')
+process.GlobalTag = customiseGlobalTag(process.GlobalTag, globaltag = '90X_upgrade2017_TSG_Hcal_V2')
 #process.GlobalTag = customiseGlobalTag(process.GlobalTag, globaltag = 'auto:run2_mc_GRun')
 process.GlobalTag.connect   = 'frontier://FrontierProd/CMS_CONDITIONS'
 process.GlobalTag.pfnPrefix = cms.untracked.string('frontier://FrontierProd/')
@@ -31,7 +31,7 @@ process.GlobalTag.ReconnectEachRun = cms.untracked.bool( False )
 
 
 process.triggerinfo = cms.EDAnalyzer('TriggerResultsInfo',
-   TriggerResults = cms.InputTag("TriggerResults","","TEST"),
+   TriggerResults = cms.InputTag("TriggerResults","","HLT2"),
 )
 
 
