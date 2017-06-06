@@ -48,7 +48,7 @@
 // constructor "usesResource("TFileService");"
 // This will improve performance in multithreaded jobs.
 
-class TriggerResultsInfo : public edm::EDAnalyzer
+class TriggerResultsInfo : public edm::one::EDAnalyzer<>
 {
    public:
       explicit TriggerResultsInfo(const edm::ParameterSet&);
@@ -61,8 +61,8 @@ class TriggerResultsInfo : public edm::EDAnalyzer
       virtual void beginJob() override;
       virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
       virtual void endJob() override;
-      virtual void beginRun(const edm::Run&, const edm::EventSetup&) override; 
-      virtual void endRun(const edm::Run&, const edm::EventSetup&) override; 
+      virtual void beginRun(const edm::Run&, const edm::EventSetup&); 
+      virtual void endRun(const edm::Run&, const edm::EventSetup&); 
 
       // ----------member data ---------------------------
       bool first_;
