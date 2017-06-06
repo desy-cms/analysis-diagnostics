@@ -38,7 +38,8 @@
 // constructor "usesResource("TFileService");"
 // This will improve performance in multithreaded jobs.
 
-class Diagnosis : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
+class Diagnosis : public edm::one::EDAnalyzer<>
+{
    public:
       explicit Diagnosis(const edm::ParameterSet&);
       ~Diagnosis();
@@ -69,7 +70,7 @@ Diagnosis::Diagnosis(const edm::ParameterSet& iConfig)
 
 {
    //now do what ever initialization is needed
-   usesResource("TFileService");
+//   usesResource("TFileService");
 
 }
 

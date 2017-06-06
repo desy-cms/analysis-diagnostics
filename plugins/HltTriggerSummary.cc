@@ -49,7 +49,7 @@
 // constructor "usesResource("TFileService");"
 // This will improve performance in multithreaded jobs.
 
-class HltTriggerSummary : public edm::EDAnalyzer
+class HltTriggerSummary : public edm::one::EDAnalyzer<>
 {
    public:
       explicit HltTriggerSummary(const edm::ParameterSet&);
@@ -62,8 +62,8 @@ class HltTriggerSummary : public edm::EDAnalyzer
       virtual void beginJob() override;
       virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
       virtual void endJob() override;
-      virtual void beginRun(const edm::Run&, const edm::EventSetup&) override; 
-      virtual void endRun(const edm::Run&, const edm::EventSetup&) override; 
+      virtual void beginRun(const edm::Run&, const edm::EventSetup&); 
+      virtual void endRun(const edm::Run&, const edm::EventSetup&); 
 
       // ----------member data ---------------------------
       std::string pathName_;

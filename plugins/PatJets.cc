@@ -45,7 +45,8 @@
 // constructor "usesResource("TFileService");"
 // This will improve performance in multithreaded jobs.
 
-class PatJets : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
+class PatJets : public edm::one::EDAnalyzer<edm::one::SharedResources>
+{
    public:
       explicit PatJets(const edm::ParameterSet&);
       ~PatJets();

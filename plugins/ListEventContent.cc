@@ -41,7 +41,7 @@
 // constructor "usesResource("TFileService");"
 // This will improve performance in multithreaded jobs.
 
-class ListEventContent : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
+class ListEventContent : public edm::one::EDAnalyzer<>  {
    public:
       explicit ListEventContent(const edm::ParameterSet&);
       ~ListEventContent();
