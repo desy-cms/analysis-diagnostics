@@ -4,13 +4,13 @@ import FWCore.ParameterSet.VarParsing as VarParsing
 process = cms.Process("Diagnosis")
 
 options = VarParsing.VarParsing ('analysis')
-options.inputFiles =  '/store/data/Run2016H/BTagCSV/MINIAOD/PromptReco-v2/000/282/800/00000/C812D088-0291-E611-832C-FA163EE3836A.root',
+options.inputFiles =  'file:/nfs/dust/cms/user/walsh/tmp/outputFULL.root',
 #options.inputFiles =  '/store/mc/RunIISummer16DR80/QCD_Pt-120to170_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8/GEN-SIM-RAW/FlatPU28to62HcalNZSRAW_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v2/130000/08C6F278-E0A2-E611-BE0C-002590D9DA9C.root',
 options.parseArguments()
 
 process.load("FWCore.MessageService.MessageLogger_cfi")
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.source = cms.Source ("PoolSource",
                              fileNames      = cms.untracked.vstring (options.inputFiles),
@@ -31,8 +31,8 @@ process.GlobalTag.ReconnectEachRun = cms.untracked.bool( False )
 
 
 process.triggerinfo = cms.EDAnalyzer('TriggerInfo',
-   PathName = cms.string("HLT_AK8PFHT750_TrimMass50_v1"),
-   TriggerResults = cms.InputTag("TriggerResults","","HLT"),
+   PathName = cms.string("HLT_CaloJets_Muons_CaloBTagCSV_PFJets_v1"),
+   TriggerResults = cms.InputTag("TriggerResults","","HLT2"),
    TriggerObjectsStandAlone  = cms.InputTag("selectedPatTrigger","","PAT"),
 )
 
