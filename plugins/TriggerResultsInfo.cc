@@ -25,7 +25,7 @@
 
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
-#include "FWCore/Framework/interface/one/EDAnalyzer.h"
+#include "FWCore/Framework/interface/EDAnalyzer.h"
 
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
@@ -42,13 +42,7 @@
 // class declaration
 //
 
-// If the analyzer does not use TFileService, please remove
-// the template argument to the base class so the class inherits
-// from  edm::one::EDAnalyzer<> and also remove the line from
-// constructor "usesResource("TFileService");"
-// This will improve performance in multithreaded jobs.
-
-class TriggerResultsInfo : public edm::one::EDAnalyzer<>
+class TriggerResultsInfo : public edm::EDAnalyzer
 {
    public:
       explicit TriggerResultsInfo(const edm::ParameterSet&);
@@ -61,16 +55,15 @@ class TriggerResultsInfo : public edm::one::EDAnalyzer<>
       virtual void beginJob() override;
       virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
       virtual void endJob() override;
+      
       virtual void beginRun(const edm::Run&, const edm::EventSetup&); 
       virtual void endRun(const edm::Run&, const edm::EventSetup&); 
 
       // ----------member data ---------------------------
-      bool first_;
-//      std::string pathName_;
-      edm::InputTag triggerResults_;
-   
-      edm::EDGetTokenT<edm::TriggerResults> triggerResultsTokens_;
       
+      bool first_;
+      edm::InputTag triggerResults_;
+      edm::EDGetTokenT<edm::TriggerResults> triggerResultsTokens_;
       HLTPrescaleProvider hltPrescaleProvider_;
       HLTConfigProvider hltConfig_;
 };
@@ -88,7 +81,6 @@ class TriggerResultsInfo : public edm::one::EDAnalyzer<>
 //
 TriggerResultsInfo::TriggerResultsInfo(const edm::ParameterSet& config):
    first_(true),
-//   pathName_(config.getParameter<std::string> ("PathName")),
    triggerResults_(config.getParameter<edm::InputTag> ("TriggerResults")),
    triggerResultsTokens_(consumes<edm::TriggerResults>(triggerResults_)),
    hltPrescaleProvider_(config, consumesCollector(), *this)
@@ -116,29 +108,6 @@ void TriggerResultsInfo::analyze(const edm::Event& event, const edm::EventSetup&
 {
    using namespace edm;
 
-//    Handle<TriggerResults> triggerResultsHandler;
-//    event.getByLabel(triggerResults_, triggerResultsHandler);
-//    const TriggerResults & triggers = *(triggerResultsHandler.product());   
-//    
-//    // Loop over all triggers
-//    std::vector<std::string> triggerNames = hltConfig_.triggerNames();
-//    for ( size_t i = 0 ; i < triggerNames.size() ; ++i )
-//    {
-//       if ( triggerNames[i] == pathName_ )
-//       {
-//          std::cout << "Path " << triggerNames[i];
-//          if ( triggers.accept(i) ) std::cout << " has fired!" << std::endl;
-//          else                      std::cout << " has not fired!" << std::endl;
-//          const std::pair<std::vector<std::pair<std::string,int> >,int> ps = hltPrescaleProvider_.prescaleValuesInDetail(event,setup,triggerNames[i]);
-//          std::cout << "     L1 prescales (in details) " << std::endl;
-//          for ( size_t j = 0; j < ps.first.size() ; ++j )
-//          {
-//             std::cout << "         " << ps.first[j].first << "  " << ps.first[j].second << std::endl;
-//          }
-//          std::cout << "     HLT prescale (in details) " << ps.second << std::endl;
-//          
-//       }
-//    }
 }
 
 
@@ -155,6 +124,7 @@ void TriggerResultsInfo::endJob()
 
 void TriggerResultsInfo::beginRun(const edm::Run & run, const edm::EventSetup & setup)
 {
+
    // MAIN STUFF
    // to be called every run
    bool changed(true);
@@ -190,18 +160,13 @@ void TriggerResultsInfo::beginRun(const edm::Run & run, const edm::EventSetup & 
       std::vector<std::string> triggerNames = hltConfig_.triggerNames();
       for ( size_t i = 0 ; i < triggerNames.size() ; ++i )
       {
-         // L1 seeds (be aware that for 2016 prompt reco the L1 information is not correct, check WBM)
-         const std::vector< std::pair< bool, std::string > > & l1GtSeeds = hltConfig_.hltL1GTSeeds(triggerNames.at(i));
+         // L1 seeds
          const std::vector< std::string > & l1TSeeds = hltConfig_.hltL1TSeeds(triggerNames.at(i));
          
          // trigger objects
          const std::vector<std::string> & saveTags = hltConfig_.saveTagsModules(triggerNames.at(i));
          outfile << triggerNames.at(i) << std::endl;
          
-         for ( size_t j = 0; j < l1GtSeeds.size(); ++j )
-         {
-            outfile << "   L1GT Seed: " << l1GtSeeds.at(j).second << ","<< std::endl;
-         }
          for ( size_t j = 0; j < l1TSeeds.size(); ++j )
          {
             outfile << "   L1T Seed: " << l1TSeeds.at(j) << ","<< std::endl;
@@ -213,11 +178,37 @@ void TriggerResultsInfo::beginRun(const edm::Run & run, const edm::EventSetup & 
          outfile << "----------------------------------------" << std::endl;
          outfile << std::endl;
       }
+      
+      
+      // Loop over all triggers
+      for ( size_t i = 0 ; i < triggerNames.size() ; ++i )
+      {
+         // L1 seeds
+         const std::vector< std::string > & l1TSeeds = hltConfig_.hltL1TSeeds(triggerNames.at(i));
+         
+         // trigger objects
+         const std::vector<std::string> & saveTags = hltConfig_.saveTagsModules(triggerNames.at(i));
+         outfile << "| " << triggerNames.at(i) << " | ";
+         
+         for ( size_t j = 0; j < l1TSeeds.size(); ++j )
+         {
+            if ( j > 0 ) break;
+            outfile << l1TSeeds.at(j) << " | ";
+            
+         }
+         for ( size_t j = 0; j < saveTags.size() ; ++j )
+         {
+            outfile << saveTags.at(j) << " <br> ";
+         }
+         outfile << " |  | " << std::endl;
+         outfile << std::endl;
+      }
+      
+      
       first_ = false;
       outfile.close();
       
    }
-   
 
 }
 
